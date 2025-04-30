@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: gr1_job_search
+    hostname: gr1_job_search
+    ports:
+      - '1444:1433'
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Gr1JobSearch@
+    restart: unless-stopped
+
   mailhog:
     image: mailhog/mailhog:v1.0.1
     ports:
