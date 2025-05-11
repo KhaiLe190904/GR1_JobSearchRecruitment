@@ -8,7 +8,9 @@ import com.hustlink.backend.features.authentication.service.AuthenticationServic
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.UnsupportedEncodingException;
 
@@ -56,6 +58,22 @@ public class AuthenticationController {
     public String resetPassword(@RequestParam String newPassword, @RequestParam String token, @RequestParam String email) {
         authenticationService.resetPassword(email, newPassword, token);
         return "Password reset successfully.";
+    }
+
+    @PutMapping("/profile/{id}")
+    public AuthenticationUser updateUserProfile(
+            @RequestAttribute("authenticationUser") AuthenticationUser user,
+            @PathVariable Long id,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String company,
+            @RequestParam(required = false) String position,
+            @RequestParam(required = false) String location
+    ){
+        if(!user.getId().equals(id)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to update user profile.");
+        }
+        return authenticationService.updateUserProfile(id, firstName, lastName, company, position, location);
     }
 
 }

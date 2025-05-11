@@ -46,7 +46,7 @@ public class AuthenticationService {
             user.get().setEmailVerificationTokenExpiryDate(LocalDateTime.now().plusMinutes(durationInMinutes));
             authenticationUserRepository.save(user.get());
             String subject = "Email Verification";
-            String body = String.format("Only one step to take full advantage of LinkedIn.\n\n"
+            String body = String.format("Only one step to take full advantage of HustLink.\n\n"
                             + "Enter this code to verify your email: " + "%s\n\n" + "The code will expire in " + "%s"
                             + " minutes.",
                     emailVerificationToken, durationInMinutes);
@@ -92,7 +92,7 @@ public class AuthenticationService {
 
         String subject = "Email Verification";
         String body = String.format("""
-                Only one step to take full advantage of LinkedIn.
+                Only one step to take full advantage of HustLink.
 
                 Enter this code to verify your email: %s. The code will expire in %s minutes.""",
                 emailVerificationToken, durationInMinutes);
@@ -153,5 +153,15 @@ public class AuthenticationService {
         } else {
             throw new IllegalArgumentException("Password reset token failed.");
         }
+    }
+
+    public AuthenticationUser updateUserProfile(Long userId, String firstName, String lastName, String company, String position, String location) {
+        AuthenticationUser user = authenticationUserRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        if (firstName != null && !firstName.isEmpty()) user.setFirstName(firstName);
+        if (lastName != null && !lastName.isEmpty()) user.setLastName(lastName);
+        if (company != null && !company.isEmpty()) user.setCompany(company);
+        if (position != null && !position.isEmpty()) user.setPosition(position);
+        if (location != null && !location.isEmpty()) user.setLocation(location);
+        return authenticationUserRepository.save(user);
     }
 }

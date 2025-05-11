@@ -4,15 +4,15 @@ import { Button } from "../../components/Button/Button";
 import { Input } from "../../components/Input/Input";
 import { Layout } from "../../components/Layout/Layout";
 import { Seperator } from "../../components/Seperator/Seperator";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { FormEvent, useState } from "react";
 import { useAuthentication } from "../../context/AuthenticationContextProvider";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 import classes from "./Login.module.scss";
 export function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuthentication();
+  const authentication = useAuthentication();
   const navigate = useNavigate();
   const location = useLocation();
   const doLogin = async (e: FormEvent<HTMLFormElement>) => {
@@ -21,17 +21,21 @@ export function Login() {
     const email = e.currentTarget.email.value;
     const password = e.currentTarget.password.value;
     try {
-      await login(email, password);
-      const destination = location.state?.from?.pathname || "/";
-      navigate(destination);
+      if (authentication && authentication.login) {
+        await authentication.login(email, password);
+        const destination = location.state?.from?.pathname || "/";
+        navigate(destination);
+      } else {
+        throw new Error("Dịch vụ xác thực không khả dụng");
+      }
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
-        setErrorMessage("Đã xảy ra lỗi không xác định");
+        toast.error("Đã xảy ra lỗi không xác định");
       }
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
   return (
@@ -53,7 +57,7 @@ export function Login() {
             onFocus={() => setErrorMessage("")}
           />
           {errorMessage && <p className={classes.error}>{errorMessage}</p>}
-          <Button type="submit" disabled = {isLoading}>
+          <Button type="submit" disabled={isLoading}>
             {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
           </Button>
           <Link to="/request-password-reset">Quên mật khẩu?</Link>
@@ -64,7 +68,6 @@ export function Login() {
           <Link to="/signup">Tham gia ngay</Link>
         </div>
       </Box>
-      <ToastContainer />
     </Layout>
   );
 }
