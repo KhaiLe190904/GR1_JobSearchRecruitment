@@ -26,6 +26,12 @@ public class AuthenticationController {
         return authenticationService.getUser(authenticationUser.getEmail());
     }
 
+    @DeleteMapping("/delete")
+    public String deleteUser(@RequestAttribute("authenticationUser") AuthenticationUser user) {
+        authenticationService.deleteUser(user.getId());
+        return "User deleted successfully";
+    }
+
     @PostMapping("/login")
     public AuthenticationResponseBody login(@Valid @RequestBody AuthenticationRequestBody loginRequestBody) {
         return authenticationService.login(loginRequestBody);

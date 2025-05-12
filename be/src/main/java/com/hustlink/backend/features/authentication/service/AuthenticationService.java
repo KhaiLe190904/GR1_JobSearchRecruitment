@@ -7,6 +7,9 @@ import com.hustlink.backend.features.authentication.repository.AuthenticationUse
 import com.hustlink.backend.features.authentication.utils.EmailService;
 import com.hustlink.backend.features.authentication.utils.Encoder;
 import com.hustlink.backend.features.authentication.utils.JsonWebToken;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +30,9 @@ public class AuthenticationService {
     private final Encoder encoder;
     private final AuthenticationUserRepository authenticationUserRepository;
     private final EmailService emailService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public static String generateEmailVerificationTokenOTP() {
         SecureRandom random = new SecureRandom();
@@ -163,5 +169,14 @@ public class AuthenticationService {
         if (position != null && !position.isEmpty()) user.setPosition(position);
         if (location != null && !location.isEmpty()) user.setLocation(location);
         return authenticationUserRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        AuthenticationUser user = entityManager.find(AuthenticationUser.class, id);
+        if (user != null) {
+            entityManager.createNativeQuery("DELETE FROM post_like WHERE user_id = :id").setParameter("id", id).executeUpdate();
+            authenticationUserRepository.deleteById(id);
+        }
     }
 }
