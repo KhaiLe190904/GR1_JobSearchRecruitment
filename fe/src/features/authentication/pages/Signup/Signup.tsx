@@ -4,7 +4,7 @@ import { Button } from "../../components/Button/Button";
 import { Input } from "../../components/Input/Input";
 import { Layout } from "../../components/Layout/Layout";
 import { Seperator } from "../../components/Seperator/Seperator";
-import classes from "./Signup.module.scss";
+import classes from "./Signup.module.css";
 import { FormEvent, useState } from "react";
 import { useAuthentication } from "../../context/AuthenticationContextProvider";
 import { toast } from "react-toastify";

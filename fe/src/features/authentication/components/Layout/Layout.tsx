@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import classes from './Layout.module.scss';
+import classes from './Layout.module.css';
 export function Layout({ children, className }: {children: ReactNode, className: string}) {
     return(
     <div className={`${classes.root} ${className}`}>

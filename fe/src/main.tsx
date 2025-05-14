@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.scss";
+import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Feed } from "./feed/pages/Feed";
 import { Login } from "./features/authentication/pages/Login/Login";

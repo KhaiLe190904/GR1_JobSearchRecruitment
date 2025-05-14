@@ -3,7 +3,7 @@ import { Box } from "../../components/Box/Box";
 import { Button } from "../../components/Button/Button";
 import { Input } from "../../components/Input/Input";
 import { Layout } from "../../components/Layout/Layout";
-import classes from "./ResetPassword.module.scss";
+import classes from "./ResetPassword.module.css";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

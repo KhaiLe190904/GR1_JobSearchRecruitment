@@ -1,5 +1,5 @@
 import { ButtonHTMLAttributes } from 'react';
-import classes from './Button.module.scss';
+import classes from './Button.module.css';
 type ButtonProps = ButtonHTMLAttributes<HTMLInputElement> & {
     outline?: boolean;
 

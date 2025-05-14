@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box } from "../../components/Box/Box";
 import { Input } from "../../components/Input/Input";
 import { Layout } from "../../components/Layout/Layout";
-import classes from "./VerifyEmail.module.scss";
+import classes from "./VerifyEmail.module.css";
 import { Button } from "../../components/Button/Button";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";

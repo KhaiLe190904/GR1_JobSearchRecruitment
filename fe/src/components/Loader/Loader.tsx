@@ -1,4 +1,4 @@
-import classes from "./Loader.module.scss";
+import classes from "./Loader.module.css";
 export function Loader() {
   return (
     <div className={classes.root}>

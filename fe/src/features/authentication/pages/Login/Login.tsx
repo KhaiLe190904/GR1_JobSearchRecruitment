@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { FormEvent, useState } from "react";
 import { useAuthentication } from "../../context/AuthenticationContextProvider";
 import "react-toastify/dist/ReactToastify.css";
-import classes from "./Login.module.scss";
+import classes from "./Login.module.css";
 export function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);

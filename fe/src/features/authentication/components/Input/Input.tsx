@@ -1,5 +1,5 @@
 import { InputHTMLAttributes } from 'react';
-import classes from './Input.module.scss';
+import classes from './Input.module.css';
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
     label: string;
 
