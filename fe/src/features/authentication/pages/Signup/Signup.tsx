@@ -1,8 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Box } from "../../components/Box/Box";
 import { Button } from "../../components/Button/Button";
-import { Input } from "../../components/Input/Input";
-import { Layout } from "../../components/Layout/Layout";
+import { Input } from "../../../../components/Input/Input";
 import { Seperator } from "../../components/Seperator/Seperator";
 import classes from "./Signup.module.css";
 import { FormEvent, useState } from "react";
@@ -48,7 +47,7 @@ export function Signup() {
     }
   };
   return (
-    <Layout className={classes.root}>
+    <div className={classes.root}>
       <Box>
         <h1>Đăng ký</h1>
         <p>Tận dụng tối đa cuộc sống nghề nghiệp của bạn</p>
@@ -73,9 +72,10 @@ export function Signup() {
         </form>
         <Seperator>Hoặc</Seperator>
         <div className={classes.register}>
-          Đã có tài khoản trên HustLink? <Link to="/login">Đăng nhập</Link>
+          Đã có tài khoản trên HustLink?{" "}
+          <Link to="/authentication/login">Đăng nhập</Link>
         </div>
       </Box>
-    </Layout>
+    </div>
   );
 }

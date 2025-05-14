@@ -1,8 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Box } from "../../components/Box/Box";
 import { Button } from "../../components/Button/Button";
-import { Input } from "../../components/Input/Input";
-import { Layout } from "../../components/Layout/Layout";
+import { Input } from "../../../../components/Input/Input";
 import { Seperator } from "../../components/Seperator/Seperator";
 import { toast } from "react-toastify";
 import { FormEvent, useState } from "react";
@@ -39,7 +38,7 @@ export function Login() {
     }
   };
   return (
-    <Layout className={classes.root}>
+    <div className={classes.root}>
       <Box>
         <h1>Đăng nhập</h1>
         <p>Chào mừng bạn đến với HustLink</p>
@@ -60,14 +59,16 @@ export function Login() {
           <Button type="submit" disabled={isLoading}>
             {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
           </Button>
-          <Link to="/request-password-reset">Quên mật khẩu?</Link>
+          <Link to="/authentication/request-password-reset">
+            Quên mật khẩu?
+          </Link>
         </form>
         <Seperator>Hoặc</Seperator>
         <div className={classes.register}>
           Chưa có tài khoản trên HustLink?{" "}
-          <Link to="/signup">Tham gia ngay</Link>
+          <Link to="/authentication/signup">Tham gia ngay</Link>
         </div>
       </Box>
-    </Layout>
+    </div>
   );
 }

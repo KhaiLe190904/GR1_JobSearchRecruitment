@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Box } from "../../components/Box/Box";
 import { Button } from "../../components/Button/Button";
-import { Input } from "../../components/Input/Input";
-import { Layout } from "../../components/Layout/Layout";
+import { Input } from "../../../../components/Input/Input";
 import classes from "./ResetPassword.module.css";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
@@ -55,7 +54,7 @@ export function ResetPassword() {
       if (response.ok) {
         setErrorMessage("");
         toast.success("Đổi mật khẩu thành công");
-        navigate("/login");
+        navigate("/authentication/login");
         return;
       }
       const { message } = await response.json();
@@ -69,7 +68,7 @@ export function ResetPassword() {
   };
 
   return (
-    <Layout className={classes.root}>
+    <div className={classes.root}>
       <Box>
         <h1>Quên mật khẩu</h1>
         {!emailSent ? (
@@ -90,7 +89,11 @@ export function ResetPassword() {
               nó khớp với tài khoản HustLink hiện có.
             </p>
             <Button type="submit">Gửi mã xác minh</Button>
-            <Button type="button" outline onClick={() => navigate("/login")}>
+            <Button
+              type="button"
+              outline
+              onClick={() => navigate("/authentication/login")}
+            >
               Quay lại
             </Button>
           </form>
@@ -119,15 +122,20 @@ export function ResetPassword() {
             />
             <p style={{ color: "red" }}>{errorMessage}</p>
             <Button type="submit">Xác nhận đổi mật khẩu</Button>
-            <Button type="button" outline onClick={() => {
+            <Button
+              type="button"
+              outline
+              onClick={() => {
                 setErrorMessage("");
-                setEmailSent(false)}}>
+                setEmailSent(false);
+              }}
+            >
               Quay lại
             </Button>
           </form>
         )}
       </Box>
       <ToastContainer />
-    </Layout>
+    </div>
   );
 }

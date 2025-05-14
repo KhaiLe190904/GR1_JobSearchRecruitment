@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Box } from "../../components/Box/Box";
-import { Input } from "../../components/Input/Input";
-import { Layout } from "../../components/Layout/Layout";
+import { Input } from "../../../../components/Input/Input";
 import classes from "./VerifyEmail.module.css";
 import { Button } from "../../components/Button/Button";
 import { useNavigate } from "react-router-dom";
@@ -69,7 +68,7 @@ export function VerifyEmail() {
     }
   };
   return (
-    <Layout className={classes.root}>
+    <div className={classes.root}>
       <Box>
         <h1>Xác thực email</h1>
         <form
@@ -105,6 +104,6 @@ export function VerifyEmail() {
         </form>
       </Box>
       <ToastContainer />
-    </Layout>
+    </div>
   );
 }
