@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -97,5 +98,15 @@ public class FeedService {
         }
         comment.setContent(content);
         return commentRepository.save(comment);
+    }
+
+    public List<Comment> getPostComments(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        return post.getComments();
+    }
+
+    public Set<AuthenticationUser> getPostLikes(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        return post.getLikes();
     }
 }

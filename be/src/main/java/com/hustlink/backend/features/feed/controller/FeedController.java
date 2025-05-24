@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,10 +69,22 @@ public class FeedController {
         return ResponseEntity.ok(post);
     }
 
+    @GetMapping("/posts/{postId}/likes")
+    public ResponseEntity<Set<AuthenticationUser>> getPostLikes(@PathVariable Long postId) {
+        Set<AuthenticationUser> likes = feedService.getPostLikes(postId);
+        return ResponseEntity.ok(likes);
+    }
+
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<Comment> addComment(@PathVariable Long postId, @RequestBody CommentDto commentDto, @RequestAttribute("authenticationUser") AuthenticationUser user) {
         Comment comment = feedService.addComment(postId, user.getId(), commentDto.getContent());
         return ResponseEntity.ok(comment);
+    }
+
+    @GetMapping("/posts/{postId}/comments")
+    public ResponseEntity<List<Comment>> getComments(@PathVariable Long postId) {
+        List<Comment> comments = feedService.getPostComments(postId);
+        return ResponseEntity.ok(comments);
     }
 
     @DeleteMapping("/comments/{commentId}")

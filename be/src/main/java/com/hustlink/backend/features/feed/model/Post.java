@@ -38,9 +38,11 @@ public class Post {
 
     private LocalDateTime updateDate;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "post_like",

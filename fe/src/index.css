@@ -7,7 +7,7 @@
 }
 
 /* Base styles for common elements */
-html, body, div, span, h1, h2, h3, h4, h5, h6, p, 
+/* html, body, div, span, h1, h2, h3, h4, h5, h6, p, 
 pre, a, code, img, small, strong, sub, sup, 
 ol, ul, li, fieldset, form, label, legend, 
 table, caption, tbody, tfoot, thead, tr, th, td {
@@ -16,7 +16,7 @@ table, caption, tbody, tfoot, thead, tr, th, td {
     box-sizing: border-box;
     font: inherit;
     color: inherit;
-}
+} */
 
 html, body {
     height: 100%;
