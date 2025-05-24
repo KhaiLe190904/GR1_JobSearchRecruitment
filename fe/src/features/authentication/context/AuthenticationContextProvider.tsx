@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { Loader } from "../../../components/Loader/Loader";
 
-interface User {
+export interface User {
   id: string;
   email: string;
   emailVerified: boolean;
@@ -121,15 +121,16 @@ export function AuthenticationContextProvider() {
     return <Navigate to="/authentication/login" />;
   }
 
-  if (user && user?.emailVerified && isOnAuthPage) {
+  if (user && !user.emailVerified && location.pathname !== "/authentication/verify-email") {
+    return <Navigate to="/authentication/verify-email" />;
+  }
+
+  if (user && isOnAuthPage) {
     return <Navigate to="/" />;
   }
 
   return (
     <AuthenticationContext.Provider value={{ user, login, signup, logout }}>
-      {user && !user.emailVerified ? (
-        <Navigate to="/authentication/verify-email" />
-      ) : null}
       <Outlet />
     </AuthenticationContext.Provider>
   );

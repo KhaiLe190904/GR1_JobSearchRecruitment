@@ -13,8 +13,13 @@ export function Profile({
   setShowProfileMenu,
   setShowNavigationMenu,
 }: ProfileProps) {
-  const { logout, user } = useAuthentication();
+  const auth = useAuthentication();
   const navigate = useNavigate();
+
+  if (!auth) return null;
+
+  const { logout, user } = auth;
+
   return (
     <div className={classes.root}>
       <button

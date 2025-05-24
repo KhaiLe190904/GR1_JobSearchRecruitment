@@ -12,6 +12,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthenticationLayout } from "./features/authentication/components/Layout/AuthenticationLayout";
 import { ApplicationLayout } from "./components/ApplicationLayout/ApplicationLayout";
+import { Profile } from "./features/authentication/pages/Profile/Profile";
 
 const router = createBrowserRouter([
   {
@@ -70,6 +71,10 @@ const router = createBrowserRouter([
           {
             path: "verify-email",
             element: <VerifyEmail />,
+          },
+          {
+            path: "profile/:id",
+            element: <Profile />,
           },
         ],
       },
