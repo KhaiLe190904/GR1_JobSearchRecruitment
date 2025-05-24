@@ -6,11 +6,14 @@ import { Button } from "../../components/Button/Button";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAuthentication } from "../../context/AuthenticationContextProvider";
+
 export function VerifyEmail() {
   const [errorMessage, setErrorMessage] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useAuthentication();
 
   const validateEmail = async (code: string) => {
     setMessage("");
@@ -28,10 +31,26 @@ export function VerifyEmail() {
       );
       if (response.ok) {
         setErrorMessage("");
-        navigate("/");
+
+        // Fetch updated user data after successful verification
+        const userResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/v1/authentication/user`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          setUser(userData);
+          // Let the context provider handle the redirect based on updated user data
+        }
+      } else {
+        const { message } = await response.json();
+        toast.error(message);
       }
-      const { message } = await response.json();
-      toast.error(message);
     } catch (error) {
       console.log(error);
       toast.error("Đã xảy ra lỗi không xác định, vui lòng thử lại sau");
