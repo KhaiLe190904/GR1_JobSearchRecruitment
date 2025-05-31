@@ -5,11 +5,21 @@ import { Input } from "../Input/Input";
 import { useAuthentication } from "../../features/authentication/context/AuthenticationContextProvider";
 import { useEffect, useState } from "react";
 import { Profile } from "./components/Profile";
+import { useWebSocket } from "../../features/websocket/websocket";
+import { request } from "../../utils/api";
+import { Notification } from "../../features/feed/pages/Notifications/Notifications";
 export function Header() {
   const { user } = useAuthentication();
+  const webSocketClient = useWebSocket();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNavigationMenu, setShowNavigationMenu] = useState(
     window.innerWidth > 1080 ? true : false
   );
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const nonReadNotificationCount = notifications.filter(
+    (notification) => !notification.read
+  ).length;
+
   useEffect(() => {
     const handleResize = () => {
       setShowNavigationMenu(window.innerWidth > 1080);
@@ -17,7 +27,32 @@ export function Header() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  useEffect(() => {
+    request<Notification[]>({
+      endpoint: "/api/v1/notifications",
+      onSuccess: setNotifications,
+      onFailure: (error) => console.log(error),
+    });
+  }, []);
+
+  useEffect(() => {
+    const subscribtion = webSocketClient?.subscribe(
+      `/topic/users/${user?.id}/notifications`,
+      (message) => {
+        const notification = JSON.parse(message.body);
+        setNotifications((prev) => {
+          const index = prev.findIndex((n) => n.id === notification.id);
+          if (index === -1) {
+            return [notification, ...prev];
+          }
+          return prev.map((n) => (n.id === notification.id ? notification : n));
+        });
+      }
+    );
+    return () => subscribtion?.unsubscribe();
+  }, [user?.id, webSocketClient]);
+
   return (
     <header className={classes.root}>
       <div className={classes.container}>
@@ -151,12 +186,11 @@ export function Header() {
                   >
                     <path d="M22 19h-8.28a2 2 0 11-3.44 0H2v-1a4.52 4.52 0 011.17-2.83l1-1.17h15.7l1 1.17A4.42 4.42 0 0122 18zM18.21 7.44A6.27 6.27 0 0012 2a6.27 6.27 0 00-6.21 5.44L5 13h14z"></path>
                   </svg>
-                  {/* <div>
+                  <div>
                     {nonReadNotificationCount > 0 ? (
                       <span className={classes.badge}>{nonReadNotificationCount}</span>
                     ) : null}
-                    
-                  </div> */}
+                  </div>
                   <span>Notications</span>
                 </NavLink>
               </li>

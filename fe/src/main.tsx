@@ -13,7 +13,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { AuthenticationLayout } from "./features/authentication/components/Layout/AuthenticationLayout";
 import { ApplicationLayout } from "./components/ApplicationLayout/ApplicationLayout";
 import { Profile } from "./features/authentication/pages/Profile/Profile";
-
+import { Notifications } from "./features/feed/pages/Notifications/Notifications";
+import { PostPage } from "./features/feed/pages/Post/Post";
 const router = createBrowserRouter([
   {
     element: <AuthenticationContextProvider />,
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <Feed />,
+          },
+          {
+            path: "posts/:id",
+            element: <PostPage />,
           },
           {
             path: "network",
@@ -40,7 +45,7 @@ const router = createBrowserRouter([
           },
           {
             path: "notifications",
-            element: <div>Notifications</div>,
+            element: <Notifications />,
           },
           {
             path: "profile/:id",

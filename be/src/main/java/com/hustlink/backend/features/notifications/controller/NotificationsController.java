@@ -1,0 +1,26 @@
+package com.hustlink.backend.features.notifications.controller;
+
+import com.hustlink.backend.features.authentication.model.AuthenticationUser;
+import com.hustlink.backend.features.notifications.model.Notification;
+import com.hustlink.backend.features.notifications.service.NotificationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/notifications")
+@RequiredArgsConstructor
+public class NotificationsController {
+    private final NotificationService notificationService;
+
+    @GetMapping
+    public List<Notification> getUserNotifications(@RequestAttribute("authenticationUser") AuthenticationUser user) {
+        return notificationService.getUserNotifications(user);
+    }
+
+    @PutMapping("/{notificationId}")
+    public Notification markNotificationAsRead(@PathVariable Long notificationId) {
+        return notificationService.markNotificationAsRead(notificationId);
+    }
+}

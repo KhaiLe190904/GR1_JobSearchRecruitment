@@ -7,6 +7,7 @@ import com.hustlink.backend.features.feed.model.Comment;
 import com.hustlink.backend.features.feed.model.Post;
 import com.hustlink.backend.features.feed.repository.CommentRepository;
 import com.hustlink.backend.features.feed.repository.PostRepository;
+import com.hustlink.backend.features.notifications.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ public class FeedService {
     private final PostRepository postRepository;
     private final AuthenticationUserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
 
     public Post createPost(PostDto postDto, Long authorId) {
         AuthenticationUser author = userRepository.findById(authorId).orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -70,15 +72,20 @@ public class FeedService {
             post.getLikes().remove(user);
         } else {
             post.getLikes().add(user);
+            notificationService.sendLikeNotification(user, post.getAuthor(), post.getId());
         }
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        notificationService.sendLikeToPost(post.getId(), savedPost.getLikes());
+        return savedPost;
     }
 
     public Comment addComment(Long postId, Long userId, String content) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not found"));
         AuthenticationUser user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        Comment comment = new Comment(post, user, content);
-        return commentRepository.save(comment);
+        Comment comment = commentRepository.save(new Comment(post, user, content));
+        notificationService.sendCommentNotification(user, post.getAuthor(), post.getId());
+        notificationService.sendCommentToPost(post.getId(), comment);
+        return comment;
     }
 
     public void deleteComment(Long commentId, Long userId) {

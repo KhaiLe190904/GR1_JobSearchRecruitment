@@ -41,7 +41,7 @@ public class AuthenticationFilter extends HttpFilter {
 
         String path = request.getRequestURI();
 
-        if (unsecuredEndpoints.contains(path) || path.startsWith("/api/v1/authentication/oauth") || path.startsWith("/api/v1/storage")) {
+        if (unsecuredEndpoints.contains(path) || path.startsWith("/api/v1/authentication/oauth") || path.startsWith("/api/v1/storage") || path.startsWith("/ws")) {
             chain.doFilter(request, response);
             return;
         }
