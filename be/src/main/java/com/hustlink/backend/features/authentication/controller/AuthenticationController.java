@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -80,6 +81,11 @@ public class AuthenticationController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to update user profile.");
         }
         return authenticationService.updateUserProfile(id, firstName, lastName, company, position, location);
+    }
+
+    @GetMapping("users")
+    public List<AuthenticationUser> getUsersWithoutAuthentication(@RequestAttribute("authenticationUser") AuthenticationUser user){
+        return authenticationService.getUsersWithoutAuthentication(user);
     }
 
 }

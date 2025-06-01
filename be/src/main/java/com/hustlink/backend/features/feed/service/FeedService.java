@@ -92,9 +92,10 @@ public class FeedService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Comment not found"));
         AuthenticationUser user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
         if (!comment.getAuthor().equals(user)) {
-            throw new IllegalArgumentException("You are not allowed to delete this comment");
+            throw new IllegalArgumentException("User is not the author of the comment");
         }
         commentRepository.delete(comment);
+        notificationService.sendDeleteCommentToPost(comment.getPost().getId(), comment);
     }
 
     public Comment editComment(Long commentId, Long userId, String content) {
@@ -104,7 +105,9 @@ public class FeedService {
             throw new IllegalArgumentException("You are not allowed to edit this comment");
         }
         comment.setContent(content);
-        return commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
+        notificationService.sendCommentToPost(savedComment.getPost().getId(), savedComment);
+        return savedComment;
     }
 
     public List<Comment> getPostComments(Long postId) {

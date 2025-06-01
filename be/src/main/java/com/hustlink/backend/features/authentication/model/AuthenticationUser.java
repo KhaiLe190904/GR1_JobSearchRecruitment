@@ -2,6 +2,7 @@ package com.hustlink.backend.features.authentication.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hustlink.backend.features.feed.model.Post;
+import com.hustlink.backend.features.messaging.model.Conversation;
 import com.hustlink.backend.features.notifications.model.Notification;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -52,6 +53,14 @@ public class AuthenticationUser {
     @JsonIgnore
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Conversation> conversationsAsAuthor;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Conversation> conversationsAsAuthorAsRecipient;
 
     public AuthenticationUser(String email, String password) {
         this.email = email;

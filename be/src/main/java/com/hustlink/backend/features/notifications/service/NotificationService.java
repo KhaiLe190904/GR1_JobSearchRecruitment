@@ -2,6 +2,8 @@ package com.hustlink.backend.features.notifications.service;
 
 import com.hustlink.backend.features.authentication.model.AuthenticationUser;
 import com.hustlink.backend.features.feed.model.Comment;
+import com.hustlink.backend.features.messaging.model.Conversation;
+import com.hustlink.backend.features.messaging.model.Message;
 import com.hustlink.backend.features.notifications.model.Notification;
 import com.hustlink.backend.features.notifications.model.NotificationType;
 import com.hustlink.backend.features.notifications.repository.NotificationRepository;
@@ -72,5 +74,14 @@ public class NotificationService {
         notification.setRead(true);
         messagingTemplate.convertAndSend("/topic/users/" + notification.getRecipient().getId() + "/notifications", notification);
         return notificationRepository.save(notification);
+    }
+
+    public void sendConversationToUsers(Long senderId, Long receiverId, Conversation conversation) {
+        messagingTemplate.convertAndSend("/topic/users/" + senderId + "/conversations", conversation);
+        messagingTemplate.convertAndSend("/topic/users/" + receiverId + "/conversations", conversation);
+    }
+
+    public void sendMessageToConversation(Long conversationId, Message message) {
+        messagingTemplate.convertAndSend("/topic/conversations/" + conversationId + "/messages", message);
     }
 }

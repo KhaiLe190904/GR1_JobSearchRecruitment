@@ -29,8 +29,14 @@ export const request = async <T>({
       const { message } = await response.json();
       throw new Error(message);
     }
-    const data: T = await response.json();
 
+    // Handle 204 No Content responses
+    if (response.status === 204) {
+      onSuccess({} as T);
+      return;
+    }
+
+    const data: T = await response.json();
     onSuccess(data);
   } catch (error) {
     if (error instanceof Error) {

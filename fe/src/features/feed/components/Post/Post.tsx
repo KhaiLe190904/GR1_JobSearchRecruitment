@@ -65,7 +65,7 @@ export function Post({ post, setPosts }: PostProps) {
         setPostLiked(likes.some((like: User) => like.id === user?.id));
       }
     );
-    return () => subscription?.unsubscribe(); 
+    return () => subscription?.unsubscribe();
   }, [post.id, user?.id, webSocketClient]);
 
   useEffect(() => {
@@ -79,6 +79,20 @@ export function Post({ post, setPosts }: PostProps) {
             return [comment, ...prev];
           }
           return prev.map((c) => (c.id === comment.id ? comment : c));
+        });
+      }
+    );
+
+    return () => subscription?.unsubscribe();
+  }, [post.id, webSocketClient]);
+
+  useEffect(() => {
+    const subscription = webSocketClient?.subscribe(
+      `/topic/comments/${post.id}/delete`,
+      (message) => {
+        const comment = JSON.parse(message.body);
+        setComments((prev) => {
+          return prev.filter((c) => c.id !== comment.id);
         });
       }
     );
