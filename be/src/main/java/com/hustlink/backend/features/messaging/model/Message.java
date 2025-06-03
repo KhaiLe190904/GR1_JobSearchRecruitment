@@ -1,6 +1,7 @@
 package com.hustlink.backend.features.messaging.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hustlink.backend.features.authentication.model.AuthenticationUser;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class Message {
     private Conversation conversation;
 
     private String content;
+    @JsonProperty("isRead")
     private boolean isRead;
 
     @CreationTimestamp

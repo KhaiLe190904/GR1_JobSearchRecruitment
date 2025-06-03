@@ -22,7 +22,7 @@ public class MessageController {
         return messageService.getConversationOfUser(user);
     }
 
-    @GetMapping("/conversations{conversationId}")
+    @GetMapping("/conversations/{conversationId}")
     public Conversation getConversation(@RequestAttribute("authenticationUser") AuthenticationUser user, @PathVariable Long conversationId) {
         return messageService.getConversation(user, conversationId);
     }

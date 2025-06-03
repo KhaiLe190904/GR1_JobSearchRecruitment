@@ -7,7 +7,8 @@ import { useEffect, useState } from "react";
 import { Profile } from "./components/Profile";
 import { useWebSocket } from "../../features/websocket/websocket";
 import { request } from "../../utils/api";
-import { Notification } from "../../features/feed/pages/Notifications/Notifications";
+import { INotification } from "../../features/feed/pages/Notifications/Notifications";
+import { IConversation } from "../../features/messaging/components/Conversations/Conversations";
 export function Header() {
   const { user } = useAuthentication();
   const webSocketClient = useWebSocket();
@@ -15,7 +16,12 @@ export function Header() {
   const [showNavigationMenu, setShowNavigationMenu] = useState(
     window.innerWidth > 1080 ? true : false
   );
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [conversations, setConversations] = useState<IConversation[]>([]);
+
+  const nonReadMessagesCount = conversations.reduce((acc, conversation) => {
+    return acc + conversation.messages.filter((message) => message.sender.id !== user?.id && !message.isRead).length;
+  }, 0);
+  const [notifications, setNotifications] = useState<INotification[]>([]);
   const nonReadNotificationCount = notifications.filter(
     (notification) => !notification.read
   ).length;
@@ -29,9 +35,17 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    request<Notification[]>({
+    request<INotification[]>({
       endpoint: "/api/v1/notifications",
       onSuccess: setNotifications,
+      onFailure: (error) => console.log(error),
+    });
+  }, []);
+
+  useEffect(() => {
+    request<IConversation[]>({
+      endpoint: "/api/v1/messaging/conversations",
+      onSuccess: setConversations,
       onFailure: (error) => console.log(error),
     });
   }, []);
@@ -53,6 +67,23 @@ export function Header() {
     return () => subscribtion?.unsubscribe();
   }, [user?.id, webSocketClient]);
 
+  useEffect(() => {
+    const subscription = webSocketClient?.subscribe(
+      `/topic/users/${user?.id}/conversations`,
+      (message) => {
+        const conversation = JSON.parse(message.body);
+        setConversations((prev) => {
+          const index = prev.findIndex((c) => c.id === conversation.id);
+          if (index === -1) {
+            return [conversation, ...prev];
+          }
+          return prev.map((c) => (c.id === conversation.id ? conversation : c));
+        });
+      }
+    )
+    return () => subscription?.unsubscribe();
+  }, [user?.id, webSocketClient]);
+
   return (
     <header className={classes.root}>
       <div className={classes.container}>
@@ -60,7 +91,7 @@ export function Header() {
           <NavLink to="/">
             <img src={logo} alt="logo" />
           </NavLink>
-          <Input type="text" placeholder="Tìm kiếm" size={"medium"} />
+          <Input type="text" placeholder="Tìm kiếm" size="medium" />
         </div>
         <div className={classes.right}>
           {showNavigationMenu ? (
@@ -158,12 +189,11 @@ export function Header() {
                   >
                     <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
                   </svg>
-                  {/* <div>
+                  <div>
                     {nonReadMessagesCount > 0 && !location.pathname.includes("messaging") ? (
                       <span className={classes.badge}>{nonReadMessagesCount}</span>
                     ) : null}
-                    
-                  </div> */}
+                  </div>
                   <span>Messaging</span>
                 </NavLink>
               </li>

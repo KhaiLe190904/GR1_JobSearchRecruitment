@@ -10,7 +10,7 @@ import { Input } from "../../../../components/Input/Input";
 import { request } from "../../../../utils/api";
 import {
   useAuthentication,
-  User,
+  IUser,
 } from "../../../authentication/context/AuthenticationContextProvider";
 import { Comment } from "../Comment/Comment";
 import { Madal } from "../Modal/Modal";
@@ -20,7 +20,7 @@ import { useWebSocket } from "../../../websocket/websocket";
 export interface Post {
   id: number;
   content: string;
-  author: User;
+  author: IUser;
   picture?: string;
   creationDate: string;
   updatedDate?: string;
@@ -34,7 +34,7 @@ interface PostProps {
 export function Post({ post, setPosts }: PostProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [showComments, setShowComments] = useState(false);
-  const [likes, setLikes] = useState<User[]>([]);
+  const [likes, setLikes] = useState<IUser[]>([]);
   const [content, setContent] = useState("");
   const navigate = useNavigate();
   const { user } = useAuthentication();
@@ -62,7 +62,7 @@ export function Post({ post, setPosts }: PostProps) {
       (message) => {
         const likes = JSON.parse(message.body);
         setLikes(likes);
-        setPostLiked(likes.some((like: User) => like.id === user?.id));
+        setPostLiked(likes.some((like: IUser) => like.id === user?.id));
       }
     );
     return () => subscription?.unsubscribe();
@@ -102,7 +102,7 @@ export function Post({ post, setPosts }: PostProps) {
 
   useEffect(() => {
     const fetchLikes = async () => {
-      await request<User[]>({
+      await request<IUser[]>({
         endpoint: `/api/v1/feed/posts/${post.id}/likes`,
         onSuccess: (data) => {
           setLikes(data);

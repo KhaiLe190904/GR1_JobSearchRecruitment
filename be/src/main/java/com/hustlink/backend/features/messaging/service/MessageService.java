@@ -6,9 +6,11 @@ import com.hustlink.backend.features.messaging.model.Conversation;
 import com.hustlink.backend.features.messaging.model.Message;
 import com.hustlink.backend.features.messaging.repository.ConversationRepository;
 import com.hustlink.backend.features.messaging.repository.MessageRepository;
+import com.hustlink.backend.features.notifications.model.Notification;
 import com.hustlink.backend.features.notifications.service.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class MessageService {
     private final AuthenticationService authenticationService;
     private final MessageRepository messageRepository;
     private final NotificationService notificationService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public List<Conversation> getConversationOfUser(AuthenticationUser user) {
         return conversationRepository.findByAuthorOrRecipient(user, user);
@@ -87,5 +90,7 @@ public class MessageService {
         }
         message.setRead(true);
         messageRepository.save(message);
+        notificationService.sendMessageToConversation(message.getConversation().getId(), message);
     }
+
 }

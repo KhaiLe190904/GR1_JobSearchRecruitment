@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { HTMLAttributes, useEffect, useState } from "react";
 import classes from "./TimeAgo.module.scss";
 import { timeAgo } from "../../utils/date";
 
-interface TimeAgoProps {
+interface TimeAgoProps extends HTMLAttributes<HTMLDivElement> {
     date: string;
     edited?: boolean;
 }
 
-export function TimeAgo({date, edited}: TimeAgoProps) {
+export function TimeAgo({date, edited, className, ...others}: TimeAgoProps) {
     const [time, setTime] = useState(timeAgo(new Date(date)));
 
     useEffect(() => {
@@ -17,7 +17,7 @@ export function TimeAgo({date, edited}: TimeAgoProps) {
         return () => clearInterval(interval);
     }, [date]);
 
-    return <div className={classes.root}>
+    return <div className={`${classes.root} ${className || ""}`} {...others}>
         <span>{time}</span>
         {edited ? <span>(Edited)</span> : null}
         </div>

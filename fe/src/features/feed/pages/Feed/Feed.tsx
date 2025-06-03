@@ -7,7 +7,7 @@ import { Post } from "../../components/Post/Post.tsx";
 import { RightSidebar } from "../../components/RightSidebar/RightSidebar.tsx";
 import classes from "./Feed.module.scss";
 import { Button } from "../../../authentication/components/Button/Button.tsx";
-import { usePageTitle } from "../../hooks/usePageTitle.tsx";
+import { usePageTitle } from "../../../../hooks/usePageTitle.tsx";
 
 export function Feed() {
   usePageTitle("Feed");

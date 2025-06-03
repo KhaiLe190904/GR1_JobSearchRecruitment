@@ -84,4 +84,6 @@ public class NotificationService {
     public void sendMessageToConversation(Long conversationId, Message message) {
         messagingTemplate.convertAndSend("/topic/conversations/" + conversationId + "/messages", message);
     }
+
+
 }
