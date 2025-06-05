@@ -14,10 +14,14 @@ export function Conversation(props: ConversationItemProps) {
   const navigate = useNavigate();
   const { id } = useParams();
   const ws = useWebSocket();
-  const [conversation, setConversation] = useState<IConversation>(props.conversation);
+  const [conversation, setConversation] = useState<IConversation>(
+    props.conversation
+  );
 
   const conversationUserToDisplay =
-    conversation.recipient.id === user?.id ? conversation.author : conversation.recipient;
+    conversation.recipient.id === user?.id
+      ? conversation.author
+      : conversation.recipient;
   const unreadMessagesCount = conversation.messages.filter(
     (message) => message.receiver.id === user?.id && !message.isRead
   ).length;
@@ -28,7 +32,9 @@ export function Conversation(props: ConversationItemProps) {
       (data) => {
         const message = JSON.parse(data.body);
         setConversation((prevConversation) => {
-          const index = prevConversation.messages.findIndex((m) => m.id === message.id);
+          const index = prevConversation.messages.findIndex(
+            (m) => m.id === message.id
+          );
           if (index == -1) {
             return {
               ...prevConversation,
@@ -38,7 +44,9 @@ export function Conversation(props: ConversationItemProps) {
 
           return {
             ...prevConversation,
-            messages: prevConversation.messages.map((m) => (m.id === message.id ? message : m)),
+            messages: prevConversation.messages.map((m) =>
+              m.id === message.id ? message : m
+            ),
           };
         });
         return () => subscription?.unsubscribe();
@@ -49,16 +57,25 @@ export function Conversation(props: ConversationItemProps) {
   return (
     <button
       key={conversation.id}
-      className={`${classes.root} ${id && Number(id) === conversation.id ? classes.selected : ""}`}
+      className={`${classes.root} ${
+        id && Number(id) === conversation.id ? classes.selected : ""
+      }`}
       onClick={() => navigate(`/messaging/conversations/${conversation.id}`)}
     >
-      <img className={classes.avatar} src={conversationUserToDisplay.profilePicture || "/doc1.png"}  alt="" />
+      <img
+        className={classes.avatar}
+        src={conversationUserToDisplay.profilePicture || "/doc1.png"}
+        alt=""
+      />
 
-      {unreadMessagesCount > 0 && <div className={classes.unread}>{unreadMessagesCount}</div>}
+      {unreadMessagesCount > 0 && (
+        <div className={classes.unread}>{unreadMessagesCount}</div>
+      )}
 
       <div>
         <div className={classes.name}>
-          {conversationUserToDisplay.firstName} {conversationUserToDisplay.lastName}
+          {conversationUserToDisplay.firstName}{" "}
+          {conversationUserToDisplay.lastName}
         </div>
         <div className={classes.content}>
           {conversation.messages[conversation.messages.length - 1]?.content}

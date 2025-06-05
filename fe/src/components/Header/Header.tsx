@@ -19,7 +19,12 @@ export function Header() {
   const [conversations, setConversations] = useState<IConversation[]>([]);
 
   const nonReadMessagesCount = conversations.reduce((acc, conversation) => {
-    return acc + conversation.messages.filter((message) => message.sender.id !== user?.id && !message.isRead).length;
+    return (
+      acc +
+      conversation.messages.filter(
+        (message) => message.sender.id !== user?.id && !message.isRead
+      ).length
+    );
   }, 0);
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const nonReadNotificationCount = notifications.filter(
@@ -80,9 +85,44 @@ export function Header() {
           return prev.map((c) => (c.id === conversation.id ? conversation : c));
         });
       }
-    )
+    );
     return () => subscription?.unsubscribe();
   }, [user?.id, webSocketClient]);
+
+  useEffect(() => {
+    const subscriptions = conversations.map((conversation) => {
+      return webSocketClient?.subscribe(
+        `/topic/conversations/${conversation.id}/messages`,
+        (data) => {
+          const message = JSON.parse(data.body);
+          setConversations((prev) => {
+            return prev.map((c) => {
+              if (c.id === conversation.id) {
+                const index = c.messages.findIndex((m) => m.id === message.id);
+                if (index === -1) {
+                  return {
+                    ...c,
+                    messages: [...c.messages, message],
+                  };
+                }
+                return {
+                  ...c,
+                  messages: c.messages.map((m) =>
+                    m.id === message.id ? message : m
+                  ),
+                };
+              }
+              return c;
+            });
+          });
+        }
+      );
+    });
+
+    return () => {
+      subscriptions.forEach((subscription) => subscription?.unsubscribe());
+    };
+  }, [conversations, webSocketClient]);
 
   return (
     <header className={classes.root}>
@@ -190,8 +230,11 @@ export function Header() {
                     <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
                   </svg>
                   <div>
-                    {nonReadMessagesCount > 0 && !location.pathname.includes("messaging") ? (
-                      <span className={classes.badge}>{nonReadMessagesCount}</span>
+                    {nonReadMessagesCount > 0 &&
+                    !location.pathname.includes("messaging") ? (
+                      <span className={classes.badge}>
+                        {nonReadMessagesCount}
+                      </span>
                     ) : null}
                   </div>
                   <span>Messaging</span>
@@ -218,7 +261,9 @@ export function Header() {
                   </svg>
                   <div>
                     {nonReadNotificationCount > 0 ? (
-                      <span className={classes.badge}>{nonReadNotificationCount}</span>
+                      <span className={classes.badge}>
+                        {nonReadNotificationCount}
+                      </span>
                     ) : null}
                   </div>
                   <span>Notications</span>
