@@ -1,74 +1,52 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { usePageTitle } from "../../../../hooks/usePageTitle.tsx";
+import { request } from "../../../../utils/api.ts";
 import { useAuthentication } from "../../../authentication/context/AuthenticationContextProvider.tsx";
+import { useWebSocket } from "../../../websocket/websocket.tsx";
 import { LeftSidebar } from "../../components/LeftSidebar/LeftSidebar.tsx";
 import { Madal } from "../../components/Modal/Modal.tsx";
-import { Post } from "../../components/Post/Post.tsx";
+import { IPost, Post } from "../../components/Post/Post.tsx";
 import { RightSidebar } from "../../components/RightSidebar/RightSidebar.tsx";
 import classes from "./Feed.module.scss";
 import { Button } from "../../../authentication/components/Button/Button.tsx";
-import { usePageTitle } from "../../../../hooks/usePageTitle.tsx";
 
 export function Feed() {
   usePageTitle("Feed");
   const [showPostingModal, setShowPostingModal] = useState(false);
-  const [feedContent, setFeedContent] = useState<"all" | "connexions">(
-    "connexions"
-  );
   const { user } = useAuthentication();
   const navigate = useNavigate();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<IPost[]>([]);
   const [error, setError] = useState("");
+  const ws = useWebSocket();
 
   useEffect(() => {
     const fetchPosts = async () => {
-      try {
-        const response = await fetch(
-          import.meta.env.VITE_API_URL +
-            "/api/v1/feed" +
-            (feedContent === "connexions" ? "" : "/posts"),
-
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          const { message } = await response.json();
-          throw new Error(message);
-        }
-        const data = await response.json();
-        setPosts(data);
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError("An error occurred. Please try again later.");
-        }
-      }
+      await request<IPost[]>({
+        endpoint: "/api/v1/feed",
+        onSuccess: (data) => setPosts(data),
+        onFailure: (error) => setError(error),
+      });
     };
     fetchPosts();
-  }, [feedContent]);
+  }, []);
+
+  useEffect(() => {
+    const subscription = ws?.subscribe(`/topic/feed/${user?.id}/post`, (data) => {
+      const post = JSON.parse(data.body);
+      setPosts((posts) => [post, ...posts]);
+    });
+    return () => subscription?.unsubscribe();
+  }, [user?.id, ws]);
 
   const handlePost = async (content: string, picture: string) => {
-    const response = await fetch(
-      import.meta.env.VITE_API_URL + "/api/v1/feed/posts",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ content, picture }),
-      }
-    );
-    if (!response.ok) {
-      const { message } = await response.json();
-      throw new Error(message);
-    }
-    const data = await response.json();
-    setPosts([data, ...posts]);
+    await request<IPost>({
+      endpoint: "/api/v1/feed/posts",
+      method: "POST",
+      body: JSON.stringify({ content, picture }),
+      onSuccess: (data) => setPosts([data, ...posts]),
+      onFailure: (error) => setError(error),
+    });
   };
 
   return (
@@ -101,25 +79,13 @@ export function Feed() {
         </div>
         {error && <div className={classes.error}>{error}</div>}
 
-        <div className={classes.header}>
-          <button
-            className={feedContent === "all" ? classes.active : ""}
-            onClick={() => setFeedContent("all")}
-          >
-            All
-          </button>
-          <button
-            className={feedContent === "connexions" ? classes.active : ""}
-            onClick={() => setFeedContent("connexions")}
-          >
-            Feed
-          </button>
-        </div>
-
         <div className={classes.feed}>
           {posts.map((post) => (
             <Post key={post.id} post={post} setPosts={setPosts} />
           ))}
+          {posts.length === 0 && (
+            <p>Start connecting with poople to build a feed that matters to you.</p>
+          )}
         </div>
       </div>
       <div className={classes.right}>

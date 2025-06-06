@@ -107,7 +107,7 @@ function INotification({
       }
     >
       <img
-        src={notification.actor.profilePicture}
+        src={notification.actor.profilePicture || "/doc1.png"}
         alt=""
         className={classes.avatar}
       />

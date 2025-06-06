@@ -3,7 +3,7 @@ package com.hustlink.backend.features.authentication.controller;
 
 import com.hustlink.backend.features.authentication.dto.AuthenticationRequestBody;
 import com.hustlink.backend.features.authentication.dto.AuthenticationResponseBody;
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
+import com.hustlink.backend.features.authentication.model.User;
 import com.hustlink.backend.features.authentication.service.AuthenticationService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -23,12 +23,12 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @GetMapping("/user")
-    public AuthenticationUser getUser(@RequestAttribute("authenticationUser") AuthenticationUser authenticationUser) {
-        return authenticationService.getUser(authenticationUser.getEmail());
+    public User getUser(@RequestAttribute("authenticationUser") User user) {
+        return authenticationService.getUser(user.getEmail());
     }
 
     @DeleteMapping("/delete")
-    public String deleteUser(@RequestAttribute("authenticationUser") AuthenticationUser user) {
+    public String deleteUser(@RequestAttribute("authenticationUser") User user) {
         authenticationService.deleteUser(user.getId());
         return "User deleted successfully";
     }
@@ -44,13 +44,13 @@ public class AuthenticationController {
     }
 
     @PutMapping("/validate-email-verification-token")
-    public String verifyEmail(@RequestParam String tokenOTP, @RequestAttribute("authenticationUser") AuthenticationUser user) {
+    public String verifyEmail(@RequestParam String tokenOTP, @RequestAttribute("authenticationUser") User user) {
         authenticationService.validateEmailVerificationToken(tokenOTP, user.getEmail());
         return "Email verified successfully.";
     }
 
     @GetMapping("/send-email-verification-token")
-    public String sendEmailVerificationToken(@RequestAttribute("authenticationUser") AuthenticationUser user) {
+    public String sendEmailVerificationToken(@RequestAttribute("authenticationUser") User user) {
         authenticationService.sendEmailVerificationToken(user.getEmail());
         return "Email verification token sent successfully.";
     }
@@ -68,8 +68,8 @@ public class AuthenticationController {
     }
 
     @PutMapping("/profile/{id}")
-    public AuthenticationUser updateUserProfile(
-            @RequestAttribute("authenticationUser") AuthenticationUser user,
+    public User updateUserProfile(
+            @RequestAttribute("authenticationUser") User user,
             @PathVariable Long id,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
@@ -84,7 +84,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("users")
-    public List<AuthenticationUser> getUsersWithoutAuthentication(@RequestAttribute("authenticationUser") AuthenticationUser user){
+    public List<User> getUsersWithoutAuthentication(@RequestAttribute("authenticationUser") User user){
         return authenticationService.getUsersWithoutAuthentication(user);
     }
 

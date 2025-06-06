@@ -1,9 +1,12 @@
 package com.hustlink.backend.features.notifications.service;
 
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
+import com.hustlink.backend.features.authentication.model.User;
 import com.hustlink.backend.features.feed.model.Comment;
+import com.hustlink.backend.features.feed.model.Post;
 import com.hustlink.backend.features.messaging.model.Conversation;
 import com.hustlink.backend.features.messaging.model.Message;
+import com.hustlink.backend.features.networking.model.Connection;
+import com.hustlink.backend.features.networking.model.Status;
 import com.hustlink.backend.features.notifications.model.Notification;
 import com.hustlink.backend.features.notifications.model.NotificationType;
 import com.hustlink.backend.features.notifications.repository.NotificationRepository;
@@ -20,11 +23,33 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public List<Notification> getUserNotifications(AuthenticationUser user) {
+    public List<Notification> getUserNotifications(User user) {
         return notificationRepository.findByRecipientOrderByCreationDateDesc(user);
     }
 
-    public void sendLikeToPost(Long postId, Set<AuthenticationUser> likes) {
+    public void sendDeleteNotificationToPost(Long postId) {
+        messagingTemplate.convertAndSend("/topic/posts/" + postId + "/delete", postId);
+    }
+
+    public void sendEditNotificationToPost(Long postId, Post post) {
+        messagingTemplate.convertAndSend("/topic/posts/" + postId + "/edit", post);
+    }
+
+    public void sendNewPostNotificationToFeed(Post post) {
+        for (Connection connection : post.getAuthor().getInitiatedConnections()) {
+            if (connection.getStatus().equals(Status.ACCEPTED)) {
+                messagingTemplate.convertAndSend("/topic/feed/" + connection.getRecipient().getId() + "/post", post);
+            }
+        }
+        for (Connection connection : post.getAuthor().getReceivedConnections()) {
+            if (connection.getStatus().equals(Status.ACCEPTED)) {
+                messagingTemplate.convertAndSend("/topic/feed/" + connection.getAuthor().getId() + "/post", post);
+            }
+        }
+    }
+
+
+    public void sendLikeToPost(Long postId, Set<User> likes) {
         messagingTemplate.convertAndSend("/topic/likes/" + postId, likes);
     }
 
@@ -36,7 +61,7 @@ public class NotificationService {
         messagingTemplate.convertAndSend("/topic/comments/" + postId + "/delete", comment);
     }
 
-    public void sendCommentNotification(AuthenticationUser author, AuthenticationUser recipient, Long resourceId) {
+    public void sendCommentNotification(User author, User recipient, Long resourceId) {
         if (author.getId().equals(recipient.getId())) {
             return;
         }
@@ -53,7 +78,7 @@ public class NotificationService {
     }
 
 
-    public void sendLikeNotification(AuthenticationUser author, AuthenticationUser recipient, Long resourceId) {
+    public void sendLikeNotification(User author, User recipient, Long resourceId) {
         if (author.getId().equals(recipient.getId())) {
             return;
         }
@@ -83,6 +108,26 @@ public class NotificationService {
 
     public void sendMessageToConversation(Long conversationId, Message message) {
         messagingTemplate.convertAndSend("/topic/conversations/" + conversationId + "/messages", message);
+    }
+
+    public void sendNewInvitationToUsers(Long senderId, Long receiverId, Connection connection) {
+        messagingTemplate.convertAndSend("/topic/users/" + receiverId + "/connections/new", connection);
+        messagingTemplate.convertAndSend("/topic/users/" + senderId + "/connections/new", connection);
+    }
+
+
+    public void sendInvitationAcceptedToUsers(Long senderId, Long receiverId, Connection connection) {
+        messagingTemplate.convertAndSend("/topic/users/" + receiverId + "/connections/accepted", connection);
+        messagingTemplate.convertAndSend("/topic/users/" + senderId + "/connections/accepted", connection);
+    }
+
+    public void sendRemoveConnectionToUsers(Long senderId, Long receiverId, Connection connection) {
+        messagingTemplate.convertAndSend("/topic/users/" + receiverId + "/connections/remove", connection);
+        messagingTemplate.convertAndSend("/topic/users/" + senderId + "/connections/remove", connection);
+    }
+
+    public void sendConnectionSeenNotification(Long id, Connection connection) {
+        messagingTemplate.convertAndSend("/topic/users/" + id + "/connections/seen", connection);
     }
 
 

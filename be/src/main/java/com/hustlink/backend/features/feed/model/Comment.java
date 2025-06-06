@@ -1,7 +1,7 @@
 package com.hustlink.backend.features.feed.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
+import com.hustlink.backend.features.authentication.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +29,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
-    private AuthenticationUser author;
+    private User author;
 
     @Column(nullable = false)
     private String content;
@@ -39,7 +39,7 @@ public class Comment {
 
     private LocalDateTime updateDate;
 
-    public Comment(Post post, AuthenticationUser user, String content) {
+    public Comment(Post post, User user, String content) {
         this.post = post;
         this.author = user;
         this.content = content;

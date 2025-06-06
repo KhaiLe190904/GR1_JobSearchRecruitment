@@ -1,7 +1,7 @@
 package com.hustlink.backend.features.feed.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
+import com.hustlink.backend.features.authentication.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -31,7 +31,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
-    private AuthenticationUser author;
+    private User author;
 
     @CreationTimestamp
     private LocalDateTime creationDate;
@@ -49,7 +49,7 @@ public class Post {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<AuthenticationUser> likes;
+    private Set<User> likes;
 
 
 
@@ -58,7 +58,7 @@ public class Post {
         updateDate = LocalDateTime.now();
     }
 
-    public Post(String content, AuthenticationUser author) {
+    public Post(String content, User author) {
         this.content = content;
         this.author = author;
     }

@@ -1,6 +1,6 @@
 package com.hustlink.backend.features.notifications.controller;
 
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
+import com.hustlink.backend.features.authentication.model.User;
 import com.hustlink.backend.features.notifications.model.Notification;
 import com.hustlink.backend.features.notifications.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ public class NotificationsController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public List<Notification> getUserNotifications(@RequestAttribute("authenticationUser") AuthenticationUser user) {
+    public List<Notification> getUserNotifications(@RequestAttribute("authenticationUser") User user) {
         return notificationService.getUserNotifications(user);
     }
 

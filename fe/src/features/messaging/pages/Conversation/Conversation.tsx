@@ -8,6 +8,7 @@ import {
 } from "../../../authentication/context/AuthenticationContextProvider";
 import { useWebSocket } from "../../../websocket/websocket";
 import { IConversation } from "../../components/Conversations/Conversations";
+import { IConnection } from "../../../networking/components/Connection/Connection";
 import { Messages } from "../../components/Messages/Messages";
 import classes from "./Conversation.module.scss";
 export function Conversation() {
@@ -57,9 +58,12 @@ export function Conversation() {
   useEffect(() => {
     if (id == "new") {
       setConversation(null);
-      request<IUser[]>({
-        endpoint: "/api/v1/authentication/users",
-        onSuccess: (data) => setSuggestingUsers(data),
+      request<IConnection[]>({
+        endpoint: "/api/v1/networking/connections",
+        onSuccess: (data) =>
+          setSuggestingUsers(
+            data.map((c) => (c.author.id === user?.id ? c.recipient : c.author))
+          ),
         onFailure: (error) => console.log(error),
       });
     } else {
@@ -126,7 +130,6 @@ export function Conversation() {
       receiverId: slectedUser?.id,
       content,
     };
-    console.log(message);
     await request<IConversation>({
       endpoint: "/api/v1/messaging/conversations",
       method: "POST",
@@ -161,7 +164,7 @@ export function Conversation() {
             <div className={classes.top}>
               <img
                 className={classes.avatar}
-                src={conversationUserToDisplay?.profilePicture}
+                src={conversationUserToDisplay?.profilePicture || "/doc1.png"}
                 alt=""
               />
               <div>
@@ -266,6 +269,9 @@ export function Conversation() {
                     ))}
                 </div>
               )}
+              {suggestingUsers.length === 0 && (
+                <div>You need to have connections to start a conversation.</div>
+              )}
             </form>
           )}
           {conversation && (
@@ -294,7 +300,9 @@ export function Conversation() {
             <button
               type="submit"
               className={classes.send}
-              disabled={postingMessage || !content.trim()}
+              disabled={
+                postingMessage || !content.trim() || (creatingNewConversation && !slectedUser)
+              }
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

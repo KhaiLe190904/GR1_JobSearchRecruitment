@@ -1,16 +1,15 @@
 .root {
-    border: 1px solid #e0e0e0;
-    background-color: white;
-    color: rgb(0 0 0 / 60%);
-    font-size: 0.9rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  
-  .root .container {
+  border: 1px solid #e0e0e0;
+  background-color: white;
+  color: rgb(0 0 0 / 60%);
+  font-size: 0.9rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .container {
     max-width: 74rem;
-    padding-inline: var(--container-padding, 1rem);
+    padding-inline: 1rem;
     margin: 0 auto;
     width: 100%;
     display: grid;
@@ -18,85 +17,71 @@
     position: relative;
     gap: 2rem;
   }
-  
-  .root .logo {
+
+  .logo {
     width: 3rem;
     height: 3rem;
     fill: var(--primary-color);
   }
-  
-  .root .left {
+
+  .left {
     display: grid;
     gap: 1rem;
     grid-template-columns: auto 1fr;
     align-items: center;
   }
-  
-  .root .right {
+
+  .right {
     display: flex;
     align-items: center;
     gap: 1rem;
-    justify-content: flex-end;
   }
-  
-  .root ul.navigation {
+
+  ul {
     position: absolute;
     top: 5rem;
     right: 1rem;
     background-color: white;
     border: 1px solid #e0e0e0;
     border-radius: 0.3rem;
-    padding: 1.5rem;
+    padding: 1rem;
     width: min(18rem, 100%);
     display: grid;
-    gap: 0.8rem;
+    gap: 0.5rem;
   }
-  
-  .root ul.navigation li {
-    width: 100%;
-  }
-  
-  .root a {
+
+  a {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.5rem;
-    border-radius: 0.3rem;
+
+    &:hover {
+      color: black;
+    }
   }
-  
-  .root a span {
-    white-space: nowrap;
-  }
-  
-  .root a:hover {
-    color: black;
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-  
-  .root .active {
+
+  .active {
     color: var(--primary-color);
   }
-  
-  .root svg {
+
+  svg {
     width: 1.5rem;
     height: 1.5rem;
-    min-width: 1.5rem;
   }
-  
-  .root .toggle {
+
+  .toggle {
     display: flex;
     flex-direction: column;
     align-items: center;
   }
-  
-  .root .notifications,
-  .root .messaging,
-  .root .network,
-  .root .jobs {
+
+  .notifications,
+  .messaging,
+  .network {
     position: relative;
   }
-  
-  .root .badge {
+
+  .badge {
     position: absolute;
     top: -0.5rem;
     left: 0.5rem;
@@ -109,47 +94,36 @@
     display: grid;
     place-items: center;
   }
-  
-  /* Media query for screen width >= 1080px */
-  @media screen and (min-width: 1080px) {
-    .root .left {
+
+  @media screen and (width >= 1080px) {
+    .left {
       grid-template-columns: auto 0.7fr 0.3fr;
     }
-  
-    .root .right {
+
+    .right {
       gap: 2rem;
-    }
-  
-    .root .right ul.navigation {
-      position: relative;
-      display: flex;
-      align-items: center;
-      width: auto;
-      gap: 2rem;
-      background-color: transparent;
-      border: none;
-      top: 0;
-      right: 0;
-      padding: 0;
-    }
-    
-    .root .right ul.navigation li {
-      width: auto;
-    }
-    
-    .root .right ul.navigation a {
-      flex-direction: column;
-      gap: 0.3rem;
-      text-align: center;
-      padding: 0.3rem;
-    }
-    
-    .root .right ul.navigation a span {
-      font-size: 0.75rem;
-    }
-  
-    .root .right .toggle {
-      display: none;
+
+      ul a {
+        flex-direction: column;
+        gap: 0;
+      }
+
+      ul {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: auto;
+        gap: 2rem;
+        background-color: transparent;
+        border: none;
+        top: 0;
+        right: 0;
+        padding: 0;
+      }
+
+      .toggle {
+        display: none;
+      }
     }
   }
-  
+}

@@ -1,7 +1,7 @@
 package com.hustlink.backend.features.feed.controller;
 
 
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
+import com.hustlink.backend.features.authentication.model.User;
 import com.hustlink.backend.features.feed.dto.CommentDto;
 import com.hustlink.backend.features.feed.dto.PostDto;
 import com.hustlink.backend.features.feed.model.Comment;
@@ -21,7 +21,7 @@ public class FeedController {
     private final FeedService feedService;
 
     @GetMapping("")
-    public ResponseEntity<List<Post>> getFeedPosts(@RequestAttribute("authenticationUser") AuthenticationUser user) {
+    public ResponseEntity<List<Post>> getFeedPosts(@RequestAttribute("authenticationUser") User user) {
         List<Post> posts = feedService.getFeedPost(user.getId());
         return ResponseEntity.ok(posts);
     }
@@ -34,13 +34,13 @@ public class FeedController {
 
 
     @PostMapping("/posts")
-    public ResponseEntity<Post> createPost(@RequestBody PostDto postDto, @RequestAttribute("authenticationUser")AuthenticationUser user) {
+    public ResponseEntity<Post> createPost(@RequestBody PostDto postDto, @RequestAttribute("authenticationUser") User user) {
         Post post = feedService.createPost(postDto, user.getId());
         return ResponseEntity.ok(post);
     }
 
     @PutMapping("/posts/{postId}")
-    public ResponseEntity<Post> editPost(@PathVariable Long postId, @RequestBody PostDto postDto, @RequestAttribute("authenticationUser") AuthenticationUser user) {
+    public ResponseEntity<Post> editPost(@PathVariable Long postId, @RequestBody PostDto postDto, @RequestAttribute("authenticationUser") User user) {
         Post post = feedService.editPost(postId, user.getId(), postDto);
         return ResponseEntity.ok(post);
     }
@@ -52,7 +52,7 @@ public class FeedController {
     }
 
     @DeleteMapping("/posts/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId, @RequestAttribute("authenticationUser")AuthenticationUser user) {
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId, @RequestAttribute("authenticationUser") User user) {
         feedService.deletePost(postId, user.getId());
         return ResponseEntity.noContent().build();
     }
@@ -64,19 +64,19 @@ public class FeedController {
     }
 
     @PutMapping("/posts/{postId}/like")
-    public ResponseEntity<Post> likePost(@PathVariable Long postId, @RequestAttribute("authenticationUser") AuthenticationUser user) {
+    public ResponseEntity<Post> likePost(@PathVariable Long postId, @RequestAttribute("authenticationUser") User user) {
         Post post = feedService.likePost(postId, user.getId());
         return ResponseEntity.ok(post);
     }
 
     @GetMapping("/posts/{postId}/likes")
-    public ResponseEntity<Set<AuthenticationUser>> getPostLikes(@PathVariable Long postId) {
-        Set<AuthenticationUser> likes = feedService.getPostLikes(postId);
+    public ResponseEntity<Set<User>> getPostLikes(@PathVariable Long postId) {
+        Set<User> likes = feedService.getPostLikes(postId);
         return ResponseEntity.ok(likes);
     }
 
     @PostMapping("/posts/{postId}/comments")
-    public ResponseEntity<Comment> addComment(@PathVariable Long postId, @RequestBody CommentDto commentDto, @RequestAttribute("authenticationUser") AuthenticationUser user) {
+    public ResponseEntity<Comment> addComment(@PathVariable Long postId, @RequestBody CommentDto commentDto, @RequestAttribute("authenticationUser") User user) {
         Comment comment = feedService.addComment(postId, user.getId(), commentDto.getContent());
         return ResponseEntity.ok(comment);
     }
@@ -88,13 +88,13 @@ public class FeedController {
     }
 
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId, @RequestAttribute("authenticationUser")AuthenticationUser user) {
+    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId, @RequestAttribute("authenticationUser") User user) {
         feedService.deleteComment(commentId, user.getId());
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/comments/{commentId}")
-    public ResponseEntity<Comment> editComment(@PathVariable Long commentId, @RequestBody CommentDto commentDto, @RequestAttribute("authenticationUser") AuthenticationUser user) {
+    public ResponseEntity<Comment> editComment(@PathVariable Long commentId, @RequestBody CommentDto commentDto, @RequestAttribute("authenticationUser") User user) {
         Comment comment = feedService.editComment(commentId, user.getId(), commentDto.getContent());
         return ResponseEntity.ok(comment);
     }

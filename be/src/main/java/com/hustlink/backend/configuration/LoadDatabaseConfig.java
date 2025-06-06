@@ -1,10 +1,13 @@
 package com.hustlink.backend.configuration;
 
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
-import com.hustlink.backend.features.authentication.repository.AuthenticationUserRepository;
+import com.hustlink.backend.features.authentication.model.User;
+import com.hustlink.backend.features.authentication.repository.UserRepository;
 import com.hustlink.backend.features.authentication.utils.Encoder;
 import com.hustlink.backend.features.feed.model.Post;
 import com.hustlink.backend.features.feed.repository.PostRepository;
+import com.hustlink.backend.features.networking.model.Connection;
+import com.hustlink.backend.features.networking.model.Status;
+import com.hustlink.backend.features.networking.repository.ConnectionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -25,17 +28,16 @@ public class LoadDatabaseConfig {
 
 
     @Bean
-    public CommandLineRunner initDatabase(AuthenticationUserRepository userRepository, PostRepository postRepository
-//                                          ConnectionRepository connectionRepository
+    public CommandLineRunner initDatabase(UserRepository userRepository, PostRepository postRepository, ConnectionRepository connectionRepository
     ) {
         return args -> {
-            List<AuthenticationUser> users = createUsers(userRepository);
-//            createConnections(connectionRepository, users);
+            List<User> users = createUsers(userRepository);
+            createConnections(connectionRepository, users);
             createPosts(postRepository, users);
         };
     }
 
-    private List<AuthenticationUser> createUsers(AuthenticationUserRepository userRepository) {
+    private List<User> createUsers(UserRepository userRepository) {
         List<String> firstNames = Arrays.asList(
                 "An", "Anh", "Bao", "Chi", "Dung", "Giang", "Ha", "Hai", "Hieu", "Hoa",
                 "Hung", "Khanh", "Lan", "Linh", "Long", "Mai", "Minh", "My", "Nam", "Ngoc",
@@ -70,7 +72,7 @@ public class LoadDatabaseConfig {
                 "Dubai, AE", "Dakar, SN", "Hanoi, Vietnam", "Seoul, KR", "Dienbien, Vietnam",
                 "Mumbai, IN", "Shanghai, CN", "São Paulo, BR", "Mexico City, MX", "Dublin, IE");
 
-        List<AuthenticationUser> users = new ArrayList<>();
+        List<User> users = new ArrayList<>();
         for (int i = 0; i < NUM_USERS; i++) {
             String firstName = firstNames.get(random.nextInt(firstNames.size()));
             String lastName = lastNames.get(random.nextInt(lastNames.size()));
@@ -102,25 +104,25 @@ public class LoadDatabaseConfig {
         return userRepository.saveAll(users);
     }
 
-//    private void createConnections(ConnectionRepository connectionRepository, List<User> users) {
-//        for (User user : users) {
-//            int numConnections = random.nextInt(MAX_CONNECTIONS_PER_USER - MIN_CONNECTIONS_PER_USER + 1)
-//                    + MIN_CONNECTIONS_PER_USER;
-//            Set<User> userConnections = new HashSet<>();
-//
-//            while (userConnections.size() < numConnections) {
-//                User recipient = users.get(random.nextInt(users.size()));
-//                if (!recipient.equals(user) && !userConnections.contains(recipient)) {
-//                    userConnections.add(recipient);
-//                    Connection connection = new Connection(user, recipient);
-//                    connection.setStatus(Status.ACCEPTED);
-//                    connectionRepository.save(connection);
-//                }
-//            }
-//        }
-//    }
+    private void createConnections(ConnectionRepository connectionRepository, List<User> users) {
+        for (User user : users) {
+            int numConnections = random.nextInt(MAX_CONNECTIONS_PER_USER - MIN_CONNECTIONS_PER_USER + 1)
+                    + MIN_CONNECTIONS_PER_USER;
+            Set<User> userConnections = new HashSet<>();
 
-    private void createPosts(PostRepository postRepository, List<AuthenticationUser> users) {
+            while (userConnections.size() < numConnections) {
+                User recipient = users.get(random.nextInt(users.size()));
+                if (!recipient.equals(user) && !userConnections.contains(recipient)) {
+                    userConnections.add(recipient);
+                    Connection connection = new Connection(user, recipient);
+                    connection.setStatus(Status.ACCEPTED);
+                    connectionRepository.save(connection);
+                }
+            }
+        }
+    }
+
+    private void createPosts(PostRepository postRepository, List<User> users) {
         List<String> postTemplates = Arrays.asList(
                 "Excited to share that %s just launched a new feature!",
                 "Great discussion about %s at today's team meeting.",
@@ -142,7 +144,7 @@ public class LoadDatabaseConfig {
                 "Cybersecurity", "Data Science", "IoT", "5G", "Quantum Computing", "AR/VR", "Digital Transformation",
                 "Agile Development", "Remote Work", "Tech Leadership");
 
-        for (AuthenticationUser user : users) {
+        for (User user : users) {
             int numPosts = random.nextInt(MAX_POSTS_PER_USER - MIN_POSTS_PER_USER + 1) + MIN_POSTS_PER_USER;
 
             for (int i = 0; i < numPosts; i++) {
@@ -158,8 +160,8 @@ public class LoadDatabaseConfig {
         }
     }
 
-    private HashSet<AuthenticationUser> generateLikes(List<AuthenticationUser> users, Random random) {
-        HashSet<AuthenticationUser> likes = new HashSet<>();
+    private HashSet<User> generateLikes(List<User> users, Random random) {
+        HashSet<User> likes = new HashSet<>();
         int maxLikes = Math.min(50, users.size() / 5); // Maximum 50 likes or 20% of users
         int likesCount = random.nextInt(maxLikes);
 
@@ -169,8 +171,8 @@ public class LoadDatabaseConfig {
         return likes;
     }
 
-    private HashSet<AuthenticationUser> generateLikes(List<AuthenticationUser> users, int postNumber, Random random) {
-        HashSet<AuthenticationUser> likes = new HashSet<>();
+    private HashSet<User> generateLikes(List<User> users, int postNumber, Random random) {
+        HashSet<User> likes = new HashSet<>();
 
         if (postNumber == 1) {
             while (likes.size() < 3) {
@@ -188,9 +190,9 @@ public class LoadDatabaseConfig {
         return likes;
     }
 
-    private AuthenticationUser createUser(String email, String password, String firstName, String lastName,
+    private User createUser(String email, String password, String firstName, String lastName,
                             String position, String company, String location, String profilePicture) {
-        AuthenticationUser user = new AuthenticationUser(email, encoder.encode(password));
+        User user = new User(email, encoder.encode(password));
         user.setEmailVerified(true);
         user.setFirstName(firstName);
         user.setLastName(lastName);

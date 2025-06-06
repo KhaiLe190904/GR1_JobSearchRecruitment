@@ -2,8 +2,8 @@ package com.hustlink.backend.features.authentication.service;
 
 import com.hustlink.backend.features.authentication.dto.AuthenticationRequestBody;
 import com.hustlink.backend.features.authentication.dto.AuthenticationResponseBody;
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
-import com.hustlink.backend.features.authentication.repository.AuthenticationUserRepository;
+import com.hustlink.backend.features.authentication.model.User;
+import com.hustlink.backend.features.authentication.repository.UserRepository;
 import com.hustlink.backend.features.authentication.utils.EmailService;
 import com.hustlink.backend.features.authentication.utils.Encoder;
 import com.hustlink.backend.features.authentication.utils.JsonWebToken;
@@ -29,7 +29,7 @@ public class AuthenticationService {
 
     private final JsonWebToken jsonWebToken;
     private final Encoder encoder;
-    private final AuthenticationUserRepository authenticationUserRepository;
+    private final UserRepository userRepository;
     private final EmailService emailService;
 
     @PersistenceContext
@@ -45,13 +45,13 @@ public class AuthenticationService {
     }
 
     public void sendEmailVerificationToken(String email) {
-        Optional<AuthenticationUser> user = authenticationUserRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent() && !user.get().getEmailVerified()) {
             String emailVerificationToken = generateEmailVerificationTokenOTP();
             String hashedToken = encoder.encode(emailVerificationToken);
             user.get().setEmailVerificationToken(hashedToken);
             user.get().setEmailVerificationTokenExpiryDate(LocalDateTime.now().plusMinutes(durationInMinutes));
-            authenticationUserRepository.save(user.get());
+            userRepository.save(user.get());
             String subject = "Email Verification";
             String body = String.format("Only one step to take full advantage of HustLink.\n\n"
                             + "Enter this code to verify your email: " + "%s\n\n" + "The code will expire in " + "%s"
@@ -68,13 +68,13 @@ public class AuthenticationService {
     }
 
     public void validateEmailVerificationToken(String tokenOTP, String email) {
-        Optional<AuthenticationUser> user = authenticationUserRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent() && encoder.matches(tokenOTP, user.get().getEmailVerificationToken())
                 && !user.get().getEmailVerificationTokenExpiryDate().isBefore(LocalDateTime.now())) {
             user.get().setEmailVerified(true);
             user.get().setEmailVerificationToken(null);
             user.get().setEmailVerificationTokenExpiryDate(null);
-            authenticationUserRepository.save(user.get());
+            userRepository.save(user.get());
         } else if (user.isPresent() && encoder.matches(tokenOTP, user.get().getEmailVerificationToken())
                 && user.get().getEmailVerificationTokenExpiryDate().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Email verification token expired.");
@@ -83,19 +83,19 @@ public class AuthenticationService {
         }
     }
 
-    public AuthenticationUser getUser(String email) {
-        return authenticationUserRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public User getUser(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
     public AuthenticationResponseBody register(AuthenticationRequestBody registerRequestBody) {
-        AuthenticationUser user = authenticationUserRepository.save(new AuthenticationUser(registerRequestBody.getEmail(), encoder.encode(registerRequestBody.getPassword())));
+        User user = userRepository.save(new User(registerRequestBody.getEmail(), encoder.encode(registerRequestBody.getPassword())));
 
         String emailVerificationToken = generateEmailVerificationTokenOTP();
         String hashedToken = encoder.encode(emailVerificationToken);
         user.setEmailVerificationToken(hashedToken);
         user.setEmailVerificationTokenExpiryDate(LocalDateTime.now().plusMinutes(durationInMinutes));
 
-        authenticationUserRepository.save(user);
+        userRepository.save(user);
 
         String subject = "Email Verification";
         String body = String.format("""
@@ -114,7 +114,7 @@ public class AuthenticationService {
 
 
     public AuthenticationResponseBody login(AuthenticationRequestBody loginRequestBody) {
-        AuthenticationUser user = authenticationUserRepository.findByEmail(loginRequestBody.getEmail()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByEmail(loginRequestBody.getEmail()).orElseThrow(() -> new IllegalArgumentException("User not found"));
         if(!encoder.matches(loginRequestBody.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Wrong password");
         }
@@ -123,13 +123,13 @@ public class AuthenticationService {
     }
 
     public void sendPasswordResetToken(String email) {
-        Optional<AuthenticationUser> user = authenticationUserRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
             String passwordResetToken = generateEmailVerificationTokenOTP();
             String hashedToken = encoder.encode(passwordResetToken);
             user.get().setPasswordResetToken(hashedToken);
             user.get().setPasswordResetTokenExpiryDate(LocalDateTime.now().plusMinutes(durationInMinutes));
-            authenticationUserRepository.save(user.get());
+            userRepository.save(user.get());
             String subject = "Password Reset";
             String body = String.format("""
                     You requested a password reset.
@@ -147,13 +147,13 @@ public class AuthenticationService {
     }
 
     public void resetPassword(String email, String newPassword, String token) {
-        Optional<AuthenticationUser> user = authenticationUserRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent() && encoder.matches(token, user.get().getPasswordResetToken())
                 && !user.get().getPasswordResetTokenExpiryDate().isBefore(LocalDateTime.now())) {
             user.get().setPasswordResetToken(null);
             user.get().setPasswordResetTokenExpiryDate(null);
             user.get().setPassword(encoder.encode(newPassword));
-            authenticationUserRepository.save(user.get());
+            userRepository.save(user.get());
         } else if (user.isPresent() && encoder.matches(token, user.get().getPasswordResetToken())
                 && user.get().getPasswordResetTokenExpiryDate().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Password reset token expired.");
@@ -162,31 +162,31 @@ public class AuthenticationService {
         }
     }
 
-    public AuthenticationUser updateUserProfile(Long userId, String firstName, String lastName, String company, String position, String location) {
-        AuthenticationUser user = authenticationUserRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+    public User updateUserProfile(Long userId, String firstName, String lastName, String company, String position, String location) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         if (firstName != null && !firstName.isEmpty()) user.setFirstName(firstName);
         if (lastName != null && !lastName.isEmpty()) user.setLastName(lastName);
         if (company != null && !company.isEmpty()) user.setCompany(company);
         if (position != null && !position.isEmpty()) user.setPosition(position);
         if (location != null && !location.isEmpty()) user.setLocation(location);
-        return authenticationUserRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Transactional
     public void deleteUser(Long id) {
-        AuthenticationUser user = entityManager.find(AuthenticationUser.class, id);
+        User user = entityManager.find(User.class, id);
         if (user != null) {
             entityManager.createNativeQuery("DELETE FROM post_like WHERE user_id = :id").setParameter("id", id).executeUpdate();
-            authenticationUserRepository.deleteById(id);
+            userRepository.deleteById(id);
         }
     }
 
-    public List<AuthenticationUser> getUsersWithoutAuthentication(AuthenticationUser user) {
-        return authenticationUserRepository.findAllByIdNot(user.getId());
+    public List<User> getUsersWithoutAuthentication(User user) {
+        return userRepository.findAllByIdNot(user.getId());
     }
 
-    public AuthenticationUser getUserById(Long receiverId) {
-        return authenticationUserRepository.findById(receiverId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public User getUserById(Long receiverId) {
+        return userRepository.findById(receiverId).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
 

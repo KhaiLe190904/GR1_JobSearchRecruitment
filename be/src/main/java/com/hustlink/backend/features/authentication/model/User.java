@@ -3,10 +3,9 @@ package com.hustlink.backend.features.authentication.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hustlink.backend.features.feed.model.Post;
 import com.hustlink.backend.features.messaging.model.Conversation;
+import com.hustlink.backend.features.networking.model.Connection;
 import com.hustlink.backend.features.notifications.model.Notification;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,7 +16,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationUser {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,7 +61,15 @@ public class AuthenticationUser {
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Conversation> conversationsAsAuthorAsRecipient;
 
-    public AuthenticationUser(String email, String password) {
+    @JsonIgnore
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Connection> initiatedConnections;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Connection> receivedConnections;
+
+    public User(String email, String password) {
         this.email = email;
         this.password = password;
     }

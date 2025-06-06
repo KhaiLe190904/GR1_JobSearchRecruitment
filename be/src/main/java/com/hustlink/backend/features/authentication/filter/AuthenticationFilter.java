@@ -1,7 +1,7 @@
 package com.hustlink.backend.features.authentication.filter;
 
 
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
+import com.hustlink.backend.features.authentication.model.User;
 import com.hustlink.backend.features.authentication.service.AuthenticationService;
 import com.hustlink.backend.features.authentication.utils.JsonWebToken;
 import jakarta.servlet.FilterChain;
@@ -59,7 +59,7 @@ public class AuthenticationFilter extends HttpFilter {
             }
 
             String email = jsonWebTokenService.getEmailFromToken(token);
-            AuthenticationUser user = authenticationService.getUser(email);
+            User user = authenticationService.getUser(email);
             request.setAttribute("authenticationUser", user);
             chain.doFilter(request, response);
         } catch (Exception e) {

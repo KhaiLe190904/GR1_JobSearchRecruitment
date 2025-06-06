@@ -9,6 +9,7 @@ import { useWebSocket } from "../../features/websocket/websocket";
 import { request } from "../../utils/api";
 import { INotification } from "../../features/feed/pages/Notifications/Notifications";
 import { IConversation } from "../../features/messaging/components/Conversations/Conversations";
+import { IConnection } from "../../features/networking/components/Connection/Connection";
 export function Header() {
   const { user } = useAuthentication();
   const webSocketClient = useWebSocket();
@@ -17,6 +18,7 @@ export function Header() {
     window.innerWidth > 1080 ? true : false
   );
   const [conversations, setConversations] = useState<IConversation[]>([]);
+  const [invitations, setInvitations] = useState<IConnection[]>([]);
 
   const nonReadMessagesCount = conversations.reduce((acc, conversation) => {
     return (
@@ -124,6 +126,75 @@ export function Header() {
     };
   }, [conversations, webSocketClient]);
 
+  useEffect(() => {
+    request<IConnection[]>({
+      endpoint: "/api/v1/networking/connections?status=PENDING",
+      onSuccess: (data) =>
+        setInvitations(
+          data.filter((c) => !c.seen && c.recipient.id === user?.id)
+        ),
+      onFailure: (error) => console.log(error),
+    });
+  }, [user?.id]);
+
+  useEffect(() => {
+    const subscription = webSocketClient?.subscribe(
+      "/topic/users/" + user?.id + "/connections/new",
+      (data) => {
+        const connection = JSON.parse(data.body);
+        setInvitations((connections) =>
+          connection.recipient.id === user?.id
+            ? [connection, ...connections]
+            : connections
+        );
+      }
+    );
+
+    return () => subscription?.unsubscribe();
+  }, [user?.id, webSocketClient]);
+
+  useEffect(() => {
+    const subscription = webSocketClient?.subscribe(
+      "/topic/users/" + user?.id + "/connections/accepted",
+      (data) => {
+        const connection = JSON.parse(data.body);
+        setInvitations((invitations) =>
+          invitations.filter((c) => c.id !== connection.id)
+        );
+      }
+    );
+
+    return () => subscription?.unsubscribe();
+  }, [user?.id, webSocketClient]);
+
+  useEffect(() => {
+    const subscription = webSocketClient?.subscribe(
+      "/topic/users/" + user?.id + "/connections/remove",
+      (data) => {
+        const connection = JSON.parse(data.body);
+        setInvitations((invitations) =>
+          invitations.filter((c) => c.id !== connection.id)
+        );
+      }
+    );
+
+    return () => subscription?.unsubscribe();
+  }, [user?.id, webSocketClient]);
+
+  useEffect(() => {
+    const subscription = webSocketClient?.subscribe(
+      "/topic/users/" + user?.id + "/connections/seen",
+      (data) => {
+        const connection = JSON.parse(data.body);
+        setInvitations((invitations) =>
+          invitations.filter((c) => c.id !== connection.id)
+        );
+      }
+    );
+
+    return () => subscription?.unsubscribe();
+  }, [user?.id, webSocketClient]);
+
   return (
     <header className={classes.root}>
       <div className={classes.container}>
@@ -179,12 +250,11 @@ export function Header() {
                   >
                     <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5 3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5a2.5 2.5 0 00-2.5-2.5zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
                   </svg>
-                  {/* <div>
+                  <div>
                     {invitations.length > 0 && !location.pathname.includes("network") ? (
                       <span className={classes.badge}>{invitations.length}</span>
                     ) : null}
-                    
-                  </div> */}
+                  </div>
                   <span>Network</span>
                 </NavLink>
               </li>

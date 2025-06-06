@@ -1,7 +1,7 @@
 package com.hustlink.backend.features.messaging.model;
 
 
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
+import com.hustlink.backend.features.authentication.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,15 +23,15 @@ public class Conversation {
     private Long id;
 
     @ManyToOne(optional = false)
-    private AuthenticationUser author;
+    private User author;
 
     @ManyToOne(optional = false)
-    private AuthenticationUser recipient;
+    private User recipient;
 
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages = new ArrayList<>();
 
-    public Conversation(AuthenticationUser author, AuthenticationUser recipient) {
+    public Conversation(User author, User recipient) {
         this.author = author;
         this.recipient = recipient;
     }

@@ -2,7 +2,7 @@ package com.hustlink.backend.features.messaging.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
+import com.hustlink.backend.features.authentication.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,10 +24,10 @@ public class Message {
     private Long id;
 
     @ManyToOne(optional = false)
-    private AuthenticationUser sender;
+    private User sender;
 
     @ManyToOne(optional = false)
-    private AuthenticationUser receiver;
+    private User receiver;
 
     @JsonIgnore
     @ManyToOne(optional = false)
@@ -40,7 +40,7 @@ public class Message {
     @CreationTimestamp
     private LocalDateTime creationAt;
 
-    public Message(AuthenticationUser sender, AuthenticationUser receiver, Conversation conversation, String content) {
+    public Message(User sender, User receiver, Conversation conversation, String content) {
         this.sender = sender;
         this.receiver = receiver;
         this.conversation = conversation;

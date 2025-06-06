@@ -1,12 +1,11 @@
 package com.hustlink.backend.features.messaging.service;
 
-import com.hustlink.backend.features.authentication.model.AuthenticationUser;
+import com.hustlink.backend.features.authentication.model.User;
 import com.hustlink.backend.features.authentication.service.AuthenticationService;
 import com.hustlink.backend.features.messaging.model.Conversation;
 import com.hustlink.backend.features.messaging.model.Message;
 import com.hustlink.backend.features.messaging.repository.ConversationRepository;
 import com.hustlink.backend.features.messaging.repository.MessageRepository;
-import com.hustlink.backend.features.notifications.model.Notification;
 import com.hustlink.backend.features.notifications.service.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +23,11 @@ public class MessageService {
     private final NotificationService notificationService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public List<Conversation> getConversationOfUser(AuthenticationUser user) {
+    public List<Conversation> getConversationOfUser(User user) {
         return conversationRepository.findByAuthorOrRecipient(user, user);
     }
 
-    public Conversation getConversation(AuthenticationUser user, Long conversationId) {
+    public Conversation getConversation(User user, Long conversationId) {
         Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(() -> new IllegalArgumentException("Conversation not found"));
         if(!conversation.getAuthor().getId().equals(user.getId()) && !conversation.getRecipient().getId().equals(user.getId())) {
             throw new IllegalArgumentException("You are not allowed to access this conversation");
@@ -37,8 +36,8 @@ public class MessageService {
     }
 
     @Transactional
-    public Conversation createConversationAndAddMessage(AuthenticationUser sender, Long receiverId, String content) {
-        AuthenticationUser receiver = authenticationService.getUserById(receiverId);
+    public Conversation createConversationAndAddMessage(User sender, Long receiverId, String content) {
+        User receiver = authenticationService.getUserById(receiverId);
         conversationRepository.findByAuthorAndRecipient(sender, receiver).ifPresentOrElse(
                 conversation -> {
                     throw new IllegalArgumentException("Conversation already exists, use the conversation id to send messages.");
@@ -63,8 +62,8 @@ public class MessageService {
         return conversation;
     }
 
-    public Message addMessageToConversation(Long conversationId, AuthenticationUser sender, Long receiverId, String content) {
-        AuthenticationUser receiver = authenticationService.getUserById(receiverId);
+    public Message addMessageToConversation(Long conversationId, User sender, Long receiverId, String content) {
+        User receiver = authenticationService.getUserById(receiverId);
         Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(() -> new IllegalArgumentException("Conversation not found"));
 
         if(!conversation.getAuthor().getId().equals(sender.getId()) && !conversation.getRecipient().getId().equals(sender.getId())) {
@@ -83,7 +82,7 @@ public class MessageService {
         return message;
     }
 
-    public void markMessageAsRead(AuthenticationUser user, Long messageId) {
+    public void markMessageAsRead(User user, Long messageId) {
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new IllegalArgumentException("Message not found"));
         if(!message.getReceiver().getId().equals(user.getId())){
             throw new IllegalArgumentException("You are not allowed to access this message");
