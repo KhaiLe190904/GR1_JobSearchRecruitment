@@ -162,11 +162,13 @@ export function Conversation() {
           </div>
           {conversation && (
             <div className={classes.top}>
+              <button onClick={() => navigate(`/profile/${conversationUserToDisplay?.id}`)}>
               <img
                 className={classes.avatar}
                 src={conversationUserToDisplay?.profilePicture || "/doc1.png"}
                 alt=""
               />
+              </button>
               <div>
                 <div className={classes.name}>
                   {conversationUserToDisplay?.firstName}{" "}

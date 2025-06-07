@@ -25,6 +25,8 @@ export interface IUser {
   location?: string;
   profileComplete: boolean;
   profilePicture?: string;
+  coverPicture?: string;
+  about?: string;
 }
 
 interface AuthenticationContextType {
@@ -93,7 +95,7 @@ export function AuthenticationContextProvider() {
     setIsLoading(true);
     const fetchUser = async () => {
       await request<IUser>({
-        endpoint: "/api/v1/authentication/user",
+        endpoint: "/api/v1/authentication/users/me",
         onSuccess: (data) => setUser(data),
         onFailure: (error) => {
           console.log(error);

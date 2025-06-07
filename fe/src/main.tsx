@@ -7,12 +7,12 @@ import { Login } from "./features/authentication/pages/Login/Login";
 import { Signup } from "./features/authentication/pages/Signup/Signup";
 import { ResetPassword } from "./features/authentication/pages/ResetPassword/ResetPassword";
 import { VerifyEmail } from "./features/authentication/pages/VerifyEmail/VerifyEmail";
+import { Profile as LoginProfile } from "./features/authentication/pages/Profile/Profile";
 import { AuthenticationContextProvider } from "./features/authentication/context/AuthenticationContextProvider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthenticationLayout } from "./features/authentication/components/Layout/AuthenticationLayout";
 import { ApplicationLayout } from "./components/ApplicationLayout/ApplicationLayout";
-import { Profile } from "./features/authentication/pages/Profile/Profile";
 import { Notifications } from "./features/feed/pages/Notifications/Notifications";
 import { PostPage } from "./features/feed/pages/Post/Post";
 import { Messaging } from "./features/messaging/pages/Messaging/Messaging";
@@ -20,6 +20,8 @@ import { Conversation } from "./features/messaging/pages/Conversation/Conversati
 import { Network } from "./features/networking/pages/Network/Network";
 import { Connections } from "./features/networking/pages/Connections/Connections";
 import { Invitations } from "./features/networking/pages/Invitations/Invitations";
+import { Posts } from "./features/profile/pages/Posts/Posts";
+import { Profile } from "./features/profile/pages/Profile/Profile";
 const router = createBrowserRouter([
   {
     element: <AuthenticationContextProvider />,
@@ -74,7 +76,11 @@ const router = createBrowserRouter([
           },
           {
             path: "profile/:id",
-            element: <div>Profile</div>,
+            element: <Profile />,
+          },
+          {
+            path: "profile/:id/posts",
+            element: <Posts />,
           },
         ],
       },
@@ -100,7 +106,7 @@ const router = createBrowserRouter([
           },
           {
             path: "profile/:id",
-            element: <Profile />,
+            element: <LoginProfile />,
           },
         ],
       },

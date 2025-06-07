@@ -22,9 +22,9 @@ import java.util.List;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
-    @GetMapping("/user")
+    @GetMapping("/users/me")
     public User getUser(@RequestAttribute("authenticationUser") User user) {
-        return authenticationService.getUser(user.getEmail());
+        return user;
     }
 
     @DeleteMapping("/delete")
@@ -75,17 +75,25 @@ public class AuthenticationController {
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String company,
             @RequestParam(required = false) String position,
-            @RequestParam(required = false) String location
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String profilePicture,
+            @RequestParam(required = false) String coverPicture,
+            @RequestParam(required = false) String about
     ){
         if(!user.getId().equals(id)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to update user profile.");
         }
-        return authenticationService.updateUserProfile(id, firstName, lastName, company, position, location);
+        return authenticationService.updateUserProfile(id, firstName, lastName, company, position, location, profilePicture, coverPicture, about);
     }
 
     @GetMapping("users")
     public List<User> getUsersWithoutAuthentication(@RequestAttribute("authenticationUser") User user){
         return authenticationService.getUsersWithoutAuthentication(user);
+    }
+
+    @GetMapping("/users/{id}")
+    public User getUserById(@PathVariable Long id) {
+        return authenticationService.getUserById(id);
     }
 
 }

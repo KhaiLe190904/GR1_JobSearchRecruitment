@@ -39,7 +39,9 @@ public class User {
     private String position = null;
     private String location = null;
     private Boolean profileComplete = false;
+    private String coverPicture = null;
     private String profilePicture = null;
+    private String about = null;
 
     @JsonIgnore
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)

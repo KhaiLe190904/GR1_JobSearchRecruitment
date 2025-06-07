@@ -16,9 +16,11 @@ public class ConnectionController {
 
     private final ConnectionService connectionService;
 
-
     @GetMapping("/connections")
-    public List<Connection> getUserConnections(@RequestAttribute("authenticationUser") User user, @RequestParam(required = false) Status status) {
+    public List<Connection> getUserConnections(@RequestAttribute("authenticationUser") User user, @RequestParam(required = false) Status status, @RequestParam(required = false) Long userId) {
+        if (userId != null) {
+            return connectionService.getUserConnections(userId, status);
+        }
         return connectionService.getUserConnections(user, status);
     }
 

@@ -162,13 +162,16 @@ public class AuthenticationService {
         }
     }
 
-    public User updateUserProfile(Long userId, String firstName, String lastName, String company, String position, String location) {
+    public User updateUserProfile(Long userId, String firstName, String lastName, String company, String position, String location, String profilePicture, String coverPicture, String about) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         if (firstName != null && !firstName.isEmpty()) user.setFirstName(firstName);
         if (lastName != null && !lastName.isEmpty()) user.setLastName(lastName);
         if (company != null && !company.isEmpty()) user.setCompany(company);
         if (position != null && !position.isEmpty()) user.setPosition(position);
         if (location != null && !location.isEmpty()) user.setLocation(location);
+        if (profilePicture != null) user.setProfilePicture(profilePicture);
+        if (coverPicture != null) user.setCoverPicture(coverPicture);
+        if (about != null) user.setAbout(about);
         return userRepository.save(user);
     }
 
