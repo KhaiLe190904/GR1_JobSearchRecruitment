@@ -202,7 +202,7 @@ export function Header() {
           <NavLink to="/">
             <img src={logo} alt="logo" />
           </NavLink>
-          <Input type="text" placeholder="Tìm kiếm" size="medium" />
+          <Input type="text" placeholder="Tìm kiếm" />
         </div>
         <div className={classes.right}>
           {showNavigationMenu ? (

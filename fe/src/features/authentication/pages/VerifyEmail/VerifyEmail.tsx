@@ -34,7 +34,7 @@ export function VerifyEmail() {
 
         // Fetch updated user data after successful verification
         const userResponse = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/v1/authentication/user`,
+          `${import.meta.env.VITE_API_URL}/api/v1/authentication/users/me`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
